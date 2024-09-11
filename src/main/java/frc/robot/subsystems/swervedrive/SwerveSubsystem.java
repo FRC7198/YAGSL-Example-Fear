@@ -22,6 +22,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -249,9 +250,17 @@ public class SwerveSubsystem extends SubsystemBase
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
                               DoubleSupplier headingY)
   {
-    // swerveDrive.setHeadingCorrection(true); // Normally you would want heading correction for this kind of control.
+    //swerveDrive.setHeadingCorrection(true); // Normally you would want heading correction for this kind of control.
+    
+
     return run(() -> {
 
+      SmartDashboard.putNumber("translationX", translationX.getAsDouble());
+      SmartDashboard.putNumber("translationY", translationY.getAsDouble());
+      SmartDashboard.putNumber("headingX", headingX.getAsDouble());
+      SmartDashboard.putNumber("headingY", headingY.getAsDouble());
+      SmartDashboard.putNumber("max Velocity", swerveDrive.getMaximumVelocity());
+      SmartDashboard.putNumber("Odometry Heading", swerveDrive.getOdometryHeading().getRadians());
       Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
                                                                                 translationY.getAsDouble()), 0.8);
 
@@ -361,8 +370,10 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @param velocity Velocity according to the field.
    */
+
   public void driveFieldOriented(ChassisSpeeds velocity)
   {
+    SmartDashboard.putString("Chassis Speed", velocity.toString());
     swerveDrive.driveFieldOriented(velocity);
   }
 
