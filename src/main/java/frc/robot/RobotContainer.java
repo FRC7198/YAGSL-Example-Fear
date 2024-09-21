@@ -29,6 +29,10 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  private double speedGovern = .25;
+  private double rotateGovern = .75;
+  private boolean isSpeedAdjusted = false;
+
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                          "swerve/neo"));
@@ -66,10 +70,10 @@ public class RobotContainer
     // left stick controls translation
     // right stick controls the desired angle NOT angular rotation
     Command driveFieldOrientedDirectAngle = drivebase.driveCommand(
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX());
-        //() -> driverXbox.getRightY());
+        () -> MathUtil.applyDeadband(driverXbox.getLeftY()*speedGovern, OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driverXbox.getLeftX()*speedGovern, OperatorConstants.LEFT_X_DEADBAND),
+        () -> driverXbox.getRightX()*rotateGovern,
+        () -> driverXbox.getRightY()*rotateGovern);
 
     // Applies deadbands and inverts controls because joysticks
     // are back-right positive while robot
@@ -77,9 +81,9 @@ public class RobotContainer
     // left stick controls translation
     // right stick controls the angular velocity of the robot
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * 0.5);
+        () -> MathUtil.applyDeadband(driverXbox.getLeftY()*speedGovern, OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driverXbox.getLeftX()*speedGovern, OperatorConstants.LEFT_X_DEADBAND),
+        () -> driverXbox.getRightX() * rotateGovern);
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
@@ -109,6 +113,19 @@ public class RobotContainer
     driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
   }
+
+  /*private Command speedAdjust(){
+  if (isSpeedAdjusted){
+    isSpeedAdjusted = false;
+    speedGovern = .25;
+  }else{
+    isSpeedAdjusted = true;
+    speedGovern = .75;
+  }
+  Command unusedCommand = null;
+  
+  return unusedCommand;
+}*/
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
