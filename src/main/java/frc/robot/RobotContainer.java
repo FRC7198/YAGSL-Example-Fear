@@ -18,6 +18,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.time.chrono.ThaiBuddhistChronology;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -29,8 +30,8 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
-  private double speedGovern = .25;
-  private double rotateGovern = .75;
+  private double speedGovern = .9;
+  private double rotateGovern = .9;
   private boolean isSpeedAdjusted = false;
 
   // The robot's subsystems and commands are defined here...
@@ -83,14 +84,14 @@ public class RobotContainer
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY()*speedGovern, OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX()*speedGovern, OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * rotateGovern);
+        () -> driverXbox.getRightX()*rotateGovern);
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driverXbox.getRawAxis(2));
 
-    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
   }
 
   /**
@@ -110,11 +111,13 @@ public class RobotContainer
         Commands.deferredProxy(() -> drivebase.driveToPose(
                                    new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               ));
+    //driverXbox.rightBumper().onTrue(speedAdjust());
     driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+   
   }
 
-  /*private Command speedAdjust(){
+/*private Command speedAdjust(){
   if (isSpeedAdjusted){
     isSpeedAdjusted = false;
     speedGovern = .25;
@@ -126,6 +129,7 @@ public class RobotContainer
   
   return unusedCommand;
 }*/
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
